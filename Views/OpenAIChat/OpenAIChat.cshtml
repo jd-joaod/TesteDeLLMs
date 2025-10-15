@@ -1,0 +1,26 @@
+﻿@using TesteDeLLMs_MVC.Models
+@{
+    ViewData["Title"] = "OpenAI Chat";
+}
+
+<h1 class="display-6 text-center">OpenAI Chat Page</h1>
+
+<div style="display: flex; flex-direction:column; border: 1px solid #ccc; border-radius: 5px; height: 60vh; width: 80%; justify-content: space-between; justify-self: center;">
+    <div style="padding: 5px; margin: 5px; overflow-y: auto;">
+        <div><strong>OpenAI:</strong> Hello! I'm OpenAI Chat Bot. How can i help you?'</div>
+        @if (ViewBag.History != null)
+        {
+            foreach (var t in (List<ChatTurn>)ViewBag.History)
+            {
+                <hr />
+                <p><strong>@t.Role:</strong> @t.Content</p>
+            }
+        }
+    </div>
+    <form method="post" action="@Url.Action("AskOpenAI","OpenAIChat")" style="display: flex; justify-content: space-between; border: 1px solid #ccc; border-radius: 5px; margin: 5px;">
+        @Html.AntiForgeryToken()
+        <input name="userMessage" placeholder="Ask OpenAI..." style="width: 90%; margin: 5px; border: none; outline: none;" />
+        <button type="submit" class="btn-outline-primary" style="border-radius: 5px; margin: 8px;">Send</button>
+    </form>
+</div>
+

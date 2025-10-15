@@ -1,0 +1,7 @@
+﻿.chat-area {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 65vh;
+    width: 80%;
+    justify-self: center;
+}
