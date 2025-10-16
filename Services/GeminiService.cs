@@ -23,7 +23,7 @@ namespace TesteDeLLMs_MVC.Services
         {
             var contents = new List<Content>();
 
-            //// Compressed summary of earlier turns
+            //// Compressed summary of earlier turns Gemini
             //if (!string.IsNullOrWhiteSpace(runningSummary))
             //{
             //    contents.Add(new Content

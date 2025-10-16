@@ -1,4 +1,7 @@
 using TesteDeLLMs_MVC.Services;
+using dotenv.net;
+
+DotEnv.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 var geminiKey = builder.Configuration["Gemini:APIKey"];
