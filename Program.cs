@@ -1,5 +1,6 @@
 using TesteDeLLMs_MVC.Services;
 using dotenv.net;
+using TesteDeLLMs_MVC.Models;
 
 DotEnv.Load();
 
@@ -12,12 +13,24 @@ var cohereKey = builder.Configuration["Cohere:ApiKey"];
 var cohereModel = builder.Configuration["Cohere:Model"];
 var claudeKey = builder.Configuration["Claude:ApiKey"];
 var claudeModel = builder.Configuration["Claude:Model"];
+var weatherApiKey = builder.Configuration["WeatherApi:ApiKey"];
+
+//var hostedServers = builder.Configuration
+//    .GetSection("HostedMcpServers")
+//    .Get<List<HostedMcpServer>>() ?? new();
+//builder.Services.AddSingleton(hostedServers);
 
 // Add services to the container.
 builder.Services.AddSingleton(new OpenAIService(openAIKey, openAIModel));
 builder.Services.AddSingleton(new GeminiService(geminiKey, geminiModel));
 builder.Services.AddSingleton(new CohereService(cohereKey, cohereModel));
 builder.Services.AddSingleton(new ClaudeService(claudeKey, claudeModel));
+
+builder.Services.AddSingleton(new OpenAIResponsesService(openAIKey!, openAIModel!));
+
+var hosted = builder.Configuration.GetSection("HostedMcp:Weather").Get<HostedMcpServer>()!;
+builder.Services.AddSingleton(hosted);
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(o =>
 {

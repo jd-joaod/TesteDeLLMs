@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using OpenAI;
+﻿using OpenAI;
 using OpenAI.Chat;
-using System.Text;
-using System.Text.Json;
 using TesteDeLLMs_MVC.Models;
 
 namespace TesteDeLLMs_MVC.Services
@@ -20,10 +17,6 @@ namespace TesteDeLLMs_MVC.Services
         public async Task<string> GetResponseAsync(string userMessage, IReadOnlyList<ChatTurn>? history = null, string? runningSummary = null, int recencyBuffer = 4)
         {
             var messages = new List<ChatMessage>();
-
-            //// Compressed summary of earlier turns
-            //if (!string.IsNullOrWhiteSpace(runningSummary))
-            //    messages.Add(new UserChatMessage($"Conversation summary (context): {runningSummary}"));
 
             // Recency buffer from history (Last N items)
             if (history is { Count: > 0 })

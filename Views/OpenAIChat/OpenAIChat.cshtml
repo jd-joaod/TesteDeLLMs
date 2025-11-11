@@ -13,14 +13,24 @@
             foreach (var t in (List<ChatTurn>)ViewBag.History)
             {
                 <hr />
-                <p><strong>@t.Role:</strong> @t.Content</p>
+                <div>
+                    <strong>@t.Role:</strong>
+                    @if (t.Role == "assistant" && !string.IsNullOrEmpty(t.Html))
+                    {
+                        @Html.Raw(t.Html)
+                    }
+                    else
+                    {
+                        @Html.Encode(t.Content)
+                    }
+                </div>
             }
         }
     </div>
-    <form method="post" action="@Url.Action("AskOpenAI","OpenAIChat")" style="display: flex; justify-content: space-between; border: 1px solid #ccc; border-radius: 5px; margin: 5px;">
+               
+    <form method="post" action="@Url.Action("AskWeatherHostedMcp", "OpenAIChat")" style="display: flex; justify-content: space-between; border: 1px solid #ccc; border-radius: 5px; margin: 5px;">
         @Html.AntiForgeryToken()
         <input name="userMessage" placeholder="Ask OpenAI..." style="width: 90%; margin: 5px; border: none; outline: none;" />
         <button type="submit" class="btn-outline-primary" style="border-radius: 5px; margin: 8px;">Send</button>
     </form>
 </div>
-

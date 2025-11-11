@@ -1,6 +1,6 @@
 ﻿namespace TesteDeLLMs_MVC.Models
 {
-    public record ChatTurn(string Role, string Content);
+    public record ChatTurn(string Role, string Content, string? Html = null);
     public static class ChatSession
     {
         public static List<ChatTurn> Get(HttpContext httpContext, string key)
