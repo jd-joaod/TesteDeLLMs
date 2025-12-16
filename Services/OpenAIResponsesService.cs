@@ -1,4 +1,5 @@
 ﻿using Google.GenAI.Types;
+using Microsoft.AspNetCore.Hosting.Server;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -18,7 +19,7 @@ namespace TesteDeLLMs_MVC.Services
         }
 
         public async Task<string> AskWithHostedMcpAsync(
-            string userMessage, IReadOnlyList<ChatTurn>? history, HostedMcpServer server)
+            string userMessage, IReadOnlyList<ChatTurn>? history, IEnumerable<HostedMcpServer> servers)
         {
             var messages = new List<object>();
             if (history is { Count: > 0 })
@@ -28,20 +29,23 @@ namespace TesteDeLLMs_MVC.Services
             }
             messages.Add(new { role = "user", content = userMessage });
 
+            foreach (var s in servers)
+                Console.WriteLine($"DEBUG server -> Label={s.Label}  Url={s.ServerUrl}");
+
+            var mcpTools = servers.Select(s => new
+            {
+                type = "mcp",
+                server_label = s.Label,
+                server_url = s.ServerUrl,        // <-- your SSE URL
+                allowed_tools = s.AllowedTools,   // keep tight while testing
+                require_approval = "never"
+            }).ToArray();
+
             var payload = new
             {
                 model = _model,
                 input = messages,
-                tools = new object[]
-                {
-                    new {
-                        type = "mcp",
-                        server_label = server.Label,
-                        server_url = server.ServerUrl,        // <-- your SSE URL
-                        allowed_tools = server.AllowedTools,   // keep tight while testing
-                        require_approval = "never"
-                    }
-                }
+                tools = mcpTools
                 // stream = true // add later once the basic path works
             };
 
@@ -49,13 +53,12 @@ namespace TesteDeLLMs_MVC.Services
             using var req = new HttpRequestMessage(HttpMethod.Post, "v1/responses")
             { Content = new StringContent(json, Encoding.UTF8, "application/json") };
 
+            Console.WriteLine($"DEBUG server -> request: {req}");
+
             var res = await _http.SendAsync(req);
             var body = await res.Content.ReadAsStringAsync();
             if (!res.IsSuccessStatusCode)
                 throw new Exception($"OpenAI error {res.StatusCode}: {body}");
-
-            // TEMP: log the raw JSON while debugging
-            Console.WriteLine("[Responses raw] " + body);
 
             using var doc = JsonDocument.Parse(body);
             var root = doc.RootElement;

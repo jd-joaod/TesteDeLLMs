@@ -1,6 +1,8 @@
-using TesteDeLLMs_MVC.Services;
 using dotenv.net;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using OpenAI.Embeddings;
 using TesteDeLLMs_MVC.Models;
+using TesteDeLLMs_MVC.Services;
 
 DotEnv.Load();
 
@@ -14,6 +16,7 @@ var cohereModel = builder.Configuration["Cohere:Model"];
 var claudeKey = builder.Configuration["Claude:ApiKey"];
 var claudeModel = builder.Configuration["Claude:Model"];
 var weatherApiKey = builder.Configuration["WeatherApi:ApiKey"];
+var openWeatherMapApiKey = builder.Configuration["OpenWeatherMap:ApiKey"];
 
 //var hostedServers = builder.Configuration
 //    .GetSection("HostedMcpServers")
@@ -28,8 +31,10 @@ builder.Services.AddSingleton(new ClaudeService(claudeKey, claudeModel));
 
 builder.Services.AddSingleton(new OpenAIResponsesService(openAIKey!, openAIModel!));
 
-var hosted = builder.Configuration.GetSection("HostedMcp:Weather").Get<HostedMcpServer>()!;
-builder.Services.AddSingleton(hosted);
+var weatherApi = builder.Configuration.GetSection("HostedMcp:WeatherApi").Get<HostedMcpServer>()!;
+var openWeatherMap = builder.Configuration.GetSection("HostedMcp:OpenWeatherMap").Get<HostedMcpServer>()!;
+builder.Services.AddSingleton<HostedMcpServer>(weatherApi);
+builder.Services.AddSingleton<HostedMcpServer>(openWeatherMap);
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(o =>

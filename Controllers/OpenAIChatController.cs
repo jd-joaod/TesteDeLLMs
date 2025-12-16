@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Io;
 using Ganss.Xss;
 using Markdig;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc;
 using TesteDeLLMs_MVC.Models;
 using TesteDeLLMs_MVC.Services;
@@ -12,13 +13,17 @@ namespace TesteDeLLMs_MVC.Controllers
         private readonly string openAIKey = "ChatHistory:openai:gpt-4o-mini";
         private readonly OpenAIService _openAIService;
         private readonly OpenAIResponsesService _responses;
-        private readonly HostedMcpServer _weatherServer;
+        private readonly List<HostedMcpServer> _servers;
 
-        public OpenAIChatController(OpenAIService openAIService, OpenAIResponsesService responsesService, HostedMcpServer weatherServer)
+        public OpenAIChatController(
+            OpenAIService openAIService,
+            OpenAIResponsesService responsesService,
+            IEnumerable<HostedMcpServer> servers
+        )
         {
             _openAIService = openAIService;
             _responses = responsesService;
-            _weatherServer = weatherServer;
+            _servers = servers.ToList();
         }
 
         [HttpGet]
@@ -36,7 +41,7 @@ namespace TesteDeLLMs_MVC.Controllers
             var response = await _responses.AskWithHostedMcpAsync(
                 userMessage,
                 history,
-                _weatherServer
+                _servers
             );
 
             history.Add(new ChatTurn("user", userMessage));
